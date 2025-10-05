@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 
 interface Athlete {
   id: number;
@@ -135,6 +136,7 @@ interface Stats {
 
 export default function StravaIntegration() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isUnlinking, setIsUnlinking] = useState(false);
 
   // Check if user is authenticated with Strava
   useEffect(() => {
@@ -142,7 +144,7 @@ export default function StravaIntegration() {
       try {
         const response = await fetch("/api/strava/athlete");
         setIsAuthenticated(response.ok);
-      } catch (error) {
+      } catch {
         setIsAuthenticated(false);
       }
     };
@@ -188,6 +190,27 @@ export default function StravaIntegration() {
     window.location.href = "/api/auth";
   };
 
+  const handleUnlinkStrava = async () => {
+    setIsUnlinking(true);
+    try {
+      const response = await fetch("/api/strava/unlink", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        setIsAuthenticated(false);
+        // Clear any cached data
+        window.location.reload();
+      } else {
+        console.error("Failed to unlink Strava account");
+      }
+    } catch (error) {
+      console.error("Error unlinking Strava:", error);
+    } finally {
+      setIsUnlinking(false);
+    }
+  };
+
   const formatDistance = (meters: number) => {
     return (meters / 1000).toFixed(2) + " km";
   };
@@ -222,23 +245,34 @@ export default function StravaIntegration() {
       {/* Athlete Info */}
       {athlete && (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center space-x-4">
-            {athlete.profile_medium && (
-              <img
-                src={athlete.profile_medium}
-                alt="Profile"
-                className="w-16 h-16 rounded-full"
-              />
-            )}
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800">
-                {athlete.firstname} {athlete.lastname}
-              </h2>
-              <p className="text-gray-600">@{athlete.username}</p>
-              <p className="text-sm text-gray-500">
-                {athlete.city}, {athlete.state}, {athlete.country}
-              </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              {athlete.profile_medium && (
+                <img
+                  src={athlete.profile_medium}
+                  alt="Profile"
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 rounded-full"
+                />
+              )}
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800">
+                  {athlete.firstname} {athlete.lastname}
+                </h2>
+                <p className="text-gray-600">@{athlete.username}</p>
+                <p className="text-sm text-gray-500">
+                  {athlete.city}, {athlete.state}, {athlete.country}
+                </p>
+              </div>
             </div>
+            <button
+              onClick={handleUnlinkStrava}
+              disabled={isUnlinking}
+              className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded transition-colors"
+            >
+              {isUnlinking ? "Unlinking..." : "Unlink Strava"}
+            </button>
           </div>
         </div>
       )}
