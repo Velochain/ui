@@ -2,8 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Bike, TrendingUp, Award } from "lucide-react";
 import heroImage from "@/assets/hero-cycling.jpg";
 import logo from "@/assets/velocha-logo.png";
+import { useWallet, useWalletModal } from "@vechain/dapp-kit-react";
 
 const Hero = () => {
+  const { connect } = useWallet();
+  const { open, close } = useWalletModal();
+
+  const handleStravaAuth = () => {
+    window.location.href = "/api/auth";
+  };
   return (
     <div className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background Image */}
@@ -39,7 +46,12 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-12">
-            <Button variant="hero" size="lg" className="text-lg">
+            <Button
+              onClick={handleStravaAuth}
+              variant="hero"
+              size="lg"
+              className="text-lg"
+            >
               Connect Strava
             </Button>
             <Button variant="outline" size="lg" className="text-lg">

@@ -25,7 +25,7 @@ interface Athlete {
   follower: null;
 }
 
-interface Activity {
+export interface Activity {
   id: number;
   name: string;
   distance: number;

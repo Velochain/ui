@@ -5,8 +5,11 @@ import EarningsCard from "@/components/EarningsCard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bike, Target, Flame, Wallet as WalletIcon } from "lucide-react";
-import { useState } from "react";
-import { useWallet, WalletButton } from "@vechain/dapp-kit-react";
+import { useEffect, useState } from "react";
+import { useThor, useWallet, WalletButton } from "@vechain/dapp-kit-react";
+import { cycle2earnAbi } from "@/lib/abis/cycle2earn";
+import { useQuery } from "@tanstack/react-query";
+import { Activity } from "../components/StravaIntegration";
 
 const mockActivities = [
   {
@@ -45,31 +48,50 @@ const Dashboard = () => {
   // const { isConnected, connectWallet } = useWallet();
   // const { user } = useAuth();
   const [isStravaConnected, setIsStravaConnected] = useState(false);
-  const [activities, setActivities] = useState(mockActivities);
+  // const [activities, setActivities] = useState(mockActivities);
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
 
+  const { contracts } = useThor();
+
+  const cycleToEarnContract = contracts.load(
+    "0x90ae6877c3fd0124f10a4e41042a97a61e25b765",
+    cycle2earnAbi
+  );
+
   const { account } = useWallet();
-  //   useEffect(() => {
-  //     const checkStravaConnection = async () => {
-  //       if (user) {
-  //         const { data } = await supabase
-  //           .from("profiles")
-  //           .select("strava_athlete_id")
-  //           .eq("id", user.id)
-  //           .single();
+  useEffect(() => {
+    const checkStravaConnection = async () => {
+      if (account) {
+        const stravaId = await cycleToEarnContract.read.getUserStravaId(
+          account
+        );
+        console.log("stravaId", stravaId[0]);
+        setIsStravaConnected(stravaId[0] !== "");
+        if (stravaId[0] !== "") {
+          const linkAccount = async () => {
+            try {
+              const response = await fetch("/api/link", {
+                method: "POST",
+                body: JSON.stringify({
+                  address: account,
+                  stravaId: stravaId[0],
+                }),
+              });
+              return response.json();
+            } catch (error) {
+              console.error("Error linking account:", error);
+            }
+          };
+          linkAccount();
+        }
+      }
+    };
 
-  //         setIsStravaConnected(!!data?.strava_athlete_id);
-  //       }
-  //     };
-
-  //     checkStravaConnection();
-  //   }, [user]);
+    checkStravaConnection();
+  }, [account]);
 
   const handleStravaConnect = () => {
-    const clientId = "139598";
-    const redirectUri = `${window.location.origin}/link-account`;
-    const scope = "activity:read_all";
-    window.location.href = `https://www.strava.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+    window.location.href = "/api/auth";
   };
 
   const handleSelectAll = () => {
@@ -97,6 +119,20 @@ const Dashboard = () => {
     );
     setSelectedActivities([]);
   };
+
+  const { data: activities, isLoading: activitiesLoading } = useQuery({
+    queryKey: ["strava-activities"],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/strava/activities?per_page=5&address=${account}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch activities");
+      return response.json() as Promise<Activity[]>;
+    },
+    enabled: !!account,
+  });
+
+  console.log(activities);
 
   // Show connect wallet prompt if not connected
   if (!account) {
@@ -210,7 +246,7 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="space-y-4">
-              {activities.map((activity) => (
+              {activities?.map((activity) => (
                 <ActivityCard
                   key={activity.id}
                   {...activity}

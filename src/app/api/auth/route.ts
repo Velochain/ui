@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const error = searchParams.get("error");
-  console.log(code);
+  console.log(code, STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET);
 
   if (error) {
     return NextResponse.json(
@@ -68,6 +68,12 @@ export async function GET(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 30, // 30 days
+    });
+    //set expire for token
+    response.cookies.set("strava_token_expires_at", tokenData.expires_in, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: tokenData.expires_in,
     });
 
     return response;
