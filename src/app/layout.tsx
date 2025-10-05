@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import dynamic from "next/dynamic";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Navbar from "./components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +42,10 @@ export default function RootLayout({
       >
         <DAppKitProvider node={"https://testnet.vechain.org/"}>
           <QueryClientProvider client={queryClient}>
-            {children}
+            <div className="min-h-screen bg-background">
+              <Navbar />
+              {children}
+            </div>
           </QueryClientProvider>
         </DAppKitProvider>
       </body>

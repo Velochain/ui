@@ -248,7 +248,7 @@ export default function StravaIntegration() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               {athlete.profile_medium && (
-                <img
+                <Image
                   src={athlete.profile_medium}
                   alt="Profile"
                   width={64}
