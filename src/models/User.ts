@@ -9,6 +9,7 @@ export interface IUser extends Document {
   refreshToken: string;
   expiresAt: Date;
   activities: mongoose.Types.ObjectId[];
+  claimedIds: string[];
 }
 
 const UserSchema = new Schema<IUser>(
@@ -41,6 +42,10 @@ const UserSchema = new Schema<IUser>(
         ref: "Activity",
       },
     ],
+    claimedIds: {
+      type: [String],
+      default: [],
+    },
   },
   {
     timestamps: true,

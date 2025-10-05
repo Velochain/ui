@@ -11,39 +11,6 @@ import { cycle2earnAbi } from "@/lib/abis/cycle2earn";
 import { useQuery } from "@tanstack/react-query";
 import { Activity } from "../components/StravaIntegration";
 
-const mockActivities = [
-  {
-    id: "1",
-    title: "Morning Mountain Ride",
-    distance: 42.5,
-    duration: "2h 15m",
-    elevation: 856,
-    earned: 12.75,
-    date: "Today at 7:30 AM",
-    claimed: false,
-  },
-  {
-    id: "2",
-    title: "Evening City Loop",
-    distance: 18.2,
-    duration: "1h 05m",
-    elevation: 145,
-    earned: 5.46,
-    date: "Yesterday at 6:00 PM",
-    claimed: true,
-  },
-  {
-    id: "3",
-    title: "Weekend Long Ride",
-    distance: 87.3,
-    duration: "4h 32m",
-    elevation: 1432,
-    earned: 26.19,
-    date: "2 days ago",
-    claimed: false,
-  },
-];
-
 const Dashboard = () => {
   // const { isConnected, connectWallet } = useWallet();
   // const { user } = useAuth();
@@ -59,6 +26,20 @@ const Dashboard = () => {
   );
 
   const { account } = useWallet();
+
+  const getRewards = async () => {
+    const response = await cycleToEarnContract.read.getUserRewards(account);
+    return response;
+  };
+
+  const { data: rewards } = useQuery({
+    queryKey: ["rewards"],
+    queryFn: getRewards,
+    enabled: !!account,
+  });
+
+  console.log("rewards", rewards);
+
   useEffect(() => {
     const checkStravaConnection = async () => {
       if (account) {
@@ -109,7 +90,7 @@ const Dashboard = () => {
     );
   };
 
-  const handleClaimSelected = () => {
+  const handleClaimSelected = async () => {
     // setActivities((prev) =>
     //   prev.map((activity) =>
     //     selectedActivities.includes(activity.id)
@@ -117,6 +98,15 @@ const Dashboard = () => {
     //       : activity
     //   )
     // );
+    const response = await fetch("/api/strava/activities/claim", {
+      method: "POST",
+      body: JSON.stringify({
+        address: account,
+        id: selectedActivities[0],
+      }),
+    });
+    if (!response.ok) throw new Error("Failed to claim activities");
+    return response.json();
     setSelectedActivities([]);
   };
 
@@ -192,7 +182,7 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        {/* <div className="grid md:grid-cols-3 gap-6 mb-8">
           <Card className="p-6 border-border">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10">
@@ -227,7 +217,7 @@ const Dashboard = () => {
             <p className="text-3xl font-bold">74%</p>
             <p className="text-sm text-muted-foreground mt-1">148/200 km</p>
           </Card>
-        </div>
+        </div> */}
 
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-3 gap-8">
@@ -259,7 +249,13 @@ const Dashboard = () => {
 
           <div>
             <h2 className="text-2xl font-bold mb-6">Earnings</h2>
-            <EarningsCard />
+            <EarningsCard
+              rewards={
+                typeof rewards?.[0] === "object"
+                  ? rewards?.[0]?.[0]?.toString()
+                  : "0"
+              }
+            />
           </div>
         </div>
       </main>
