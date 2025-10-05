@@ -1,36 +1,316 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VeloChain - Cycle2Earn on VeChain
 
-## Getting Started
+A decentralized fitness rewards platform that connects Strava cycling activities with VeChain blockchain to reward cyclists with tokens for their physical activities.
 
-First, run the development server:
+![VeloChain Hero](src/assets/hero-cycling.jpg)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚴‍♂️ Overview
+
+VeloChain is a Web3 fitness application that bridges the gap between physical activity and blockchain rewards. Users connect their Strava accounts to automatically track cycling activities and earn tokens based on their performance. The platform leverages VeChain's blockchain technology to provide transparent, secure, and instant rewards.
+
+### Key Features
+
+- **🔄 Strava Integration**: Seamlessly sync cycling activities from Strava
+- **💰 Token Rewards**: Earn tokens for every kilometer cycled
+- **🔗 VeChain Blockchain**: Secure and transparent reward distribution
+- **📊 Activity Dashboard**: Track your rides and earnings in real-time
+- **🏆 Gamification**: Compete with friends and earn bonus rewards
+- **🔐 Wallet Integration**: Connect with VeChain-compatible wallets
+
+## 🏗️ Architecture
+
+The application consists of three main components:
+
+1. **Frontend (Next.js)**: React-based web application with modern UI
+2. **Backend API**: Next.js API routes for Strava integration and data processing
+3. **Smart Contract**: VeChain-based Cycle2Earn contract for reward management
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- VeChain wallet (VeWorld, Sync2, etc.)
+- Strava account
+- Strava API credentials
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd vechain/ui
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.local.example .env.local
+   ```
+   
+   Configure your `.env.local`:
+   ```env
+   # Strava API Configuration
+   STRAVA_CLIENT_ID=your_strava_client_id
+   STRAVA_CLIENT_SECRET=your_strava_client_secret
+   STRAVA_REDIRECT_URI=http://localhost:3000/api/auth/callback
+   
+   # VeChain Configuration
+   MNEMONIC=your_mnemonic_phrase_for_contract_interactions
+   
+   # Database (if using)
+   MONGODB_URI=your_mongodb_connection_string
+   ```
+
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 📱 Usage
+
+### Getting Started
+
+1. **Connect Your Wallet**
+   - Click "Connect Wallet" on the homepage
+   - Select your preferred VeChain wallet
+   - Approve the connection
+
+2. **Link Strava Account**
+   - Click "Connect Strava" 
+   - Authorize the application on Strava
+   - Your cycling activities will start syncing
+
+3. **View Your Dashboard**
+   - Track your recent activities
+   - Monitor your earnings
+   - Claim rewards for completed rides
+
+### Earning Rewards
+
+- **Automatic Tracking**: Activities are automatically synced from Strava
+- **Reward Calculation**: Tokens are calculated based on distance cycled
+- **Claim Process**: Select activities and claim your rewards
+- **Transparent**: All transactions are recorded on VeChain blockchain
+
+## 🔧 API Endpoints
+
+### Authentication
+- `GET /api/auth` - Initiate Strava OAuth flow
+- `GET /api/auth/callback` - Handle Strava OAuth callback
+
+### Strava Integration
+- `GET /api/strava/athlete` - Get athlete profile data
+- `GET /api/strava/activities` - Fetch recent activities
+- `GET /api/strava/stats` - Get athlete statistics
+- `POST /api/strava/activities/claim` - Claim rewards for activities
+- `POST /api/strava/unlink` - Unlink Strava account
+
+### Account Management
+- `POST /api/link` - Link wallet address with Strava ID
+- `GET /api/test-db` - Test database connection
+
+## 🏗️ Smart Contract
+
+The Cycle2Earn smart contract handles:
+
+- **User Registration**: Connect Strava IDs to wallet addresses
+- **Reward Distribution**: Manage token rewards for activities
+- **Signature Verification**: Secure reward claiming process
+- **Reward Pool Integration**: Interface with X2Earn rewards pool
+
+### Contract Address
+```
+Testnet: 0x90ae6877c3fd0124f10a4e41042a97a61e25b765
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Key Functions
+- `connectStrava(string stravaId)` - Link Strava account
+- `addReward(address user, uint256 amount, bytes signature)` - Add rewards
+- `claimReward(address user)` - Claim accumulated rewards
+- `getUserRewards(address user)` - Get user's reward balance
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎨 UI Components
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Core Components
+- **Hero**: Landing page with call-to-action
+- **Features**: How the platform works
+- **Dashboard**: Main user interface
+- **ActivityCard**: Individual activity display
+- **EarningsCard**: Reward balance and claiming
+- **StravaIntegration**: Strava connection flow
 
-## Learn More
+### Design System
+- Built with **Tailwind CSS** for styling
+- **Radix UI** components for accessibility
+- **Lucide React** icons for consistency
+- **Responsive design** for all devices
 
-To learn more about Next.js, take a look at the following resources:
+## 🔐 Security Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **OAuth 2.0**: Secure Strava authentication
+- **Signature Verification**: Cryptographic proof for rewards
+- **Wallet Integration**: Non-custodial user control
+- **Rate Limiting**: API protection against abuse
+- **Input Validation**: Secure data handling
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📊 Strava API Integration
 
-## Deploy on Vercel
+### Setup Process
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Create Strava Application**
+   - Visit [Strava API Settings](https://www.strava.com/settings/api)
+   - Create a new application
+   - Note your Client ID and Client Secret
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. **Configure Redirect URI**
+   - Set callback domain to `localhost:3000` (development)
+   - Update for production domain
+
+3. **API Rate Limits**
+   - Unauthenticated: 100 requests/15 minutes
+   - Authenticated: 1000 requests/15 minutes
+   - Premium users: Higher limits available
+
+### Data Synced
+- **Athlete Profile**: Name, profile picture, stats
+- **Activities**: Distance, duration, elevation, type
+- **Statistics**: Weekly/monthly totals, achievements
+
+## 🚀 Deployment
+
+### Environment Setup
+
+1. **Production Environment Variables**
+   ```env
+   STRAVA_CLIENT_ID=your_production_client_id
+   STRAVA_CLIENT_SECRET=your_production_client_secret
+   STRAVA_REDIRECT_URI=https://yourdomain.com/api/auth/callback
+   MNEMONIC=your_production_mnemonic
+   ```
+
+2. **Build the Application**
+   ```bash
+   npm run build
+   ```
+
+3. **Deploy to Vercel**
+   ```bash
+   npm install -g vercel
+   vercel --prod
+   ```
+
+### Smart Contract Deployment
+
+The smart contract is deployed using Hardhat:
+
+```bash
+cd ../sdk-hardhat-integration
+npm install
+npx hardhat compile
+npx hardhat run scripts/deploy.ts --network testnet
+```
+
+## 🧪 Testing
+
+### Running Tests
+```bash
+# Frontend tests
+npm run test
+
+# Smart contract tests
+cd ../sdk-hardhat-integration
+npx hardhat test
+```
+
+### Test Coverage
+- Unit tests for components
+- Integration tests for API endpoints
+- Smart contract functionality tests
+- End-to-end user flow tests
+
+## 📈 Roadmap
+
+### Phase 1 (Current)
+- ✅ Strava integration
+- ✅ Basic reward system
+- ✅ Wallet connection
+- ✅ Activity tracking
+
+### Phase 2 (Planned)
+- 🔄 Social features and challenges
+- 🔄 NFT achievements
+- 🔄 Advanced analytics
+- 🔄 Mobile app
+
+### Phase 3 (Future)
+- 🔄 Cross-chain compatibility
+- 🔄 DeFi integrations
+- 🔄 Governance tokens
+- 🔄 Enterprise partnerships
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our contributing guidelines:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+### Development Guidelines
+- Follow TypeScript best practices
+- Use conventional commit messages
+- Ensure all tests pass
+- Update documentation as needed
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+### Common Issues
+
+**"Not authenticated with Strava"**
+- Complete the OAuth flow
+- Check environment variables
+- Verify Strava app settings
+
+**Wallet connection issues**
+- Ensure you're using a VeChain-compatible wallet
+- Check network configuration
+- Clear browser cache
+
+**Reward claiming fails**
+- Verify wallet has sufficient gas
+- Check smart contract status
+- Ensure activities are unclaimed
+
+### Getting Help
+- 📧 Email: support@velochain.com
+- 💬 Discord: [Join our community](https://discord.gg/velochain)
+- 📖 Documentation: [docs.velochain.com](https://docs.velochain.com)
+- 🐛 Issues: [GitHub Issues](https://github.com/velochain/issues)
+
+## 🙏 Acknowledgments
+
+- **VeChain Foundation** for blockchain infrastructure
+- **Strava** for fitness tracking API
+- **OpenZeppelin** for smart contract security
+- **Next.js** team for the amazing framework
+- **Community contributors** for feedback and support
+
+---
+
+**Built with ❤️ for the cycling community**
+
+*Ride more, earn more, build the future of fitness rewards.*
