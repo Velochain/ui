@@ -96,9 +96,9 @@ const Dashboard = () => {
 
   const handleSelectAll = () => {
     const unclaimedIds = activities
-      .filter((activity) => !activity.claimed)
-      .map((activity) => activity.id);
-    setSelectedActivities(unclaimedIds);
+      ?.filter((activity) => !activity?.claimed)
+      .map((activity) => String(activity.id));
+    setSelectedActivities(unclaimedIds || []);
   };
 
   const handleActivityToggle = (id: string) => {
@@ -110,13 +110,13 @@ const Dashboard = () => {
   };
 
   const handleClaimSelected = () => {
-    setActivities((prev) =>
-      prev.map((activity) =>
-        selectedActivities.includes(activity.id)
-          ? { ...activity, claimed: true }
-          : activity
-      )
-    );
+    // setActivities((prev) =>
+    //   prev.map((activity) =>
+    //     selectedActivities.includes(activity.id)
+    //       ? { ...activity, claimed: true }
+    //       : activity
+    //   )
+    // );
     setSelectedActivities([]);
   };
 
@@ -250,8 +250,8 @@ const Dashboard = () => {
                 <ActivityCard
                   key={activity.id}
                   {...activity}
-                  selected={selectedActivities.includes(activity.id)}
-                  onToggle={() => handleActivityToggle(activity.id)}
+                  selected={selectedActivities.includes(String(activity.id))}
+                  onToggle={() => handleActivityToggle(String(activity.id))}
                 />
               ))}
             </div>

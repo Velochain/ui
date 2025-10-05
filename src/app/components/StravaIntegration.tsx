@@ -64,6 +64,7 @@ export interface Activity {
   pr_count: number;
   utc_offset: number;
   has_kudoed: boolean;
+  claimed?: boolean;
 }
 
 interface Stats {

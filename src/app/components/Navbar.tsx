@@ -1,34 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut, Wallet } from "lucide-react";
+import { Menu } from "lucide-react";
 
 import { useState } from "react";
 import logo from "@/assets/velocha-logo.png";
 import { useWallet, WalletButton } from "@vechain/dapp-kit-react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Navbar = () => {
-  const navigate = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { account } = useWallet();
 
-  const handleLogout = async () => {
-    // await supabase.auth.signOut();
-    // navigate("/");
-  };
-
-  const handleWalletClick = () => {
-    // if (isConnected) {
-    //   disconnectWallet();
-    // } else {
-    //   connectWallet();
-    // }
-  };
-
-  const truncateAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
+  // const truncateAddress = (address: string) => {
+  //   return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  // };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">

@@ -14,7 +14,10 @@ const LinkAccount = () => {
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
   );
-  const [stravaProfile, setStravaProfile] = useState<any>(null);
+  const [stravaProfile, setStravaProfile] = useState<Record<
+    string,
+    string | number
+  > | null>(null);
   const [message, setMessage] = useState("");
   const router = useRouter();
 
@@ -28,7 +31,7 @@ const LinkAccount = () => {
 
   const connectAccount = async () => {
     const tx = await cycleToEarnContract.transact.connectStrava(
-      String(stravaProfile.id)
+      String(stravaProfile!.id)
     );
     await tx.wait();
   };
@@ -37,7 +40,7 @@ const LinkAccount = () => {
     try {
       const response = await fetch("/api/link", {
         method: "POST",
-        body: JSON.stringify({ address: account, stravaId: stravaProfile.id }),
+        body: JSON.stringify({ address: account, stravaId: stravaProfile!.id }),
       });
       return response.json();
     } catch (error) {
