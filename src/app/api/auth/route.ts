@@ -1,11 +1,11 @@
-import {
-  STRAVA_CLIENT_ID,
-  STRAVA_CLIENT_SECRET,
-  STRAVA_REDIRECT_URI,
-} from "@/lib/config";
+import { STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET } from "@/lib/config";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
+  const host = request.headers.get("host");
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+
+  const redirectUri = `${protocol}://${host}/api/auth`;
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const error = searchParams.get("error");
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     // Redirect to Strava authorization
     const authUrl = new URL("https://www.strava.com/oauth/authorize");
     authUrl.searchParams.set("client_id", STRAVA_CLIENT_ID!);
-    authUrl.searchParams.set("redirect_uri", STRAVA_REDIRECT_URI);
+    authUrl.searchParams.set("redirect_uri", redirectUri);
     authUrl.searchParams.set("response_type", "code");
     authUrl.searchParams.set("scope", "read,activity:read_all");
     authUrl.searchParams.set("state", "strava_auth");
