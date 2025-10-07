@@ -12,6 +12,7 @@ export interface IActivity extends Document {
   endDate?: Date;
   earned: number;
   claimed: boolean;
+  score: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,6 +61,10 @@ const ActivitySchema = new Schema<IActivity>(
     claimed: {
       type: Boolean,
       default: false,
+    },
+    score: {
+      type: Number,
+      default: 0,
     },
   },
   {

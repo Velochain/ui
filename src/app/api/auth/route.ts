@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 30, // 30 days
     });
     //set expire for token
-    response.cookies.set("strava_token_expires_at", tokenData.expires_in, {
+    response.cookies.set("strava_token_expires_at", tokenData.expires_at, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: tokenData.expires_in,

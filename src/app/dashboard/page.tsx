@@ -8,7 +8,7 @@ import { Bike, Target, Flame, Wallet as WalletIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useThor, useWallet, WalletButton } from "@vechain/dapp-kit-react";
 import { cycle2earnAbi } from "@/lib/abis/cycle2earn";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Activity } from "../components/StravaIntegration";
 
 const Dashboard = () => {
@@ -39,6 +39,23 @@ const Dashboard = () => {
   });
 
   console.log("rewards", rewards);
+
+  const fetchUser = async () => {
+    if (!account) {
+      return;
+    }
+    const response = await fetch("/api/strava/profile?address=" + account);
+    if (!response.ok) throw new Error("Failed to fetch profile");
+    return await response.json();
+  };
+
+  const { data: user } = useQuery({
+    queryKey: ["strava-user"],
+    queryFn: fetchUser,
+    enabled: !!account,
+  });
+
+  console.log("user", user);
 
   useEffect(() => {
     const checkStravaConnection = async () => {
@@ -76,9 +93,10 @@ const Dashboard = () => {
   };
 
   const handleSelectAll = () => {
-    const unclaimedIds = activities
-      ?.filter((activity) => !activity?.claimed)
-      .map((activity) => String(activity.id));
+    const unclaimedIds = user?.activities
+      ?.filter((activity: any) => activity?.claimed === false)
+      .map((activity: any) => String(activity._id));
+    console.log("unclaimedIds", unclaimedIds);
     setSelectedActivities(unclaimedIds || []);
   };
 
@@ -110,11 +128,23 @@ const Dashboard = () => {
     setSelectedActivities([]);
   };
 
+  const handleSync = async () => {
+    const response = await fetch("/api/strava/activities/sync", {
+      method: "POST",
+      body: JSON.stringify({ address: account }),
+    });
+  };
+
+  const { mutate: syncActivities } = useMutation({
+    mutationFn: handleSync,
+  });
+
   const { data: activities, isLoading: activitiesLoading } = useQuery({
     queryKey: ["strava-activities"],
     queryFn: async () => {
       const response = await fetch(
-        `/api/strava/activities?per_page=5&address=${account}`
+        `/api/strava/activities?per_page=5&address=${account}`,
+        { method: "POST" }
       );
       if (!response.ok) throw new Error("Failed to fetch activities");
       return response.json() as Promise<Activity[]>;
@@ -181,6 +211,13 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {user?.activitiesToSync > 0 && (
+          <div>
+            <div>You have {user.activitiesToSync} new activites</div>
+            <Button onClick={() => syncActivities()}>Sync</Button>
+          </div>
+        )}
+
         {/* Stats Grid */}
         {/* <div className="grid md:grid-cols-3 gap-6 mb-8">
           <Card className="p-6 border-border">
@@ -236,12 +273,12 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="space-y-4">
-              {activities?.map((activity) => (
+              {user?.activities?.map((activity: any) => (
                 <ActivityCard
                   key={activity.id}
                   {...activity}
-                  selected={selectedActivities.includes(String(activity.id))}
-                  onToggle={() => handleActivityToggle(String(activity.id))}
+                  selected={selectedActivities.includes(String(activity._id))}
+                  onToggle={() => handleActivityToggle(String(activity._id))}
                 />
               ))}
             </div>
@@ -252,7 +289,7 @@ const Dashboard = () => {
             <EarningsCard
               rewards={
                 typeof rewards?.[0] === "object"
-                  ? rewards?.[0]?.[0]?.toString()
+                  ? (rewards as any)?.[0]?.[0]?.toString()
                   : "0"
               }
             />

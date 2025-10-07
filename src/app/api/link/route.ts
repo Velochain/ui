@@ -37,7 +37,12 @@ export async function POST(request: NextRequest) {
 
     const _user = await User.findOne({ address });
     if (_user) {
-      return NextResponse.json({ message: "User already linked" });
+      // return NextResponse.json({ message: "User already linked" });
+      _user.accessToken = token || "";
+      _user.refreshToken = refreshToken || "";
+      _user.expiresAt = new Date(Number(expiresAt) * 1000 || 0);
+      await _user.save();
+      return NextResponse.json({ message: "User linked" });
     }
 
     const user = new User({
