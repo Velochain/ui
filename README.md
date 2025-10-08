@@ -161,6 +161,54 @@ Testnet: 0x90ae6877c3fd0124f10a4e41042a97a61e25b765
 - **Rate Limiting**: API protection against abuse
 - **Input Validation**: Secure data handling
 
+## ⚙️ VeChain SDK Integration
+
+### Private Key Management
+
+The application uses the VeChain SDK to interact with smart contracts. Private keys are derived from a mnemonic phrase stored securely in environment variables.
+
+**Important Notes:**
+- Private keys are always 32 bytes (256 bits)
+- Hex encoding produces exactly 64 characters (2 hex chars per byte)
+- No padding is required for properly formatted keys
+- The `0x` prefix is removed for compatibility with VeChain SDK
+
+### Thor Client Configuration
+
+The application connects to VeChain testnet using the Thor client:
+
+```typescript
+const thor = new ThorClient(
+  new SimpleHttpClient("https://testnet.vechain.org/"),
+  {
+    isPollingEnabled: false,
+  }
+);
+```
+
+### Smart Contract Initialization
+
+Smart contracts are loaded with a signer for transaction authorization:
+
+```typescript
+const cycle2earnContract = thor.contracts.load(
+  "0x90ae6877c3fd0124f10a4e41042a97a61e25b765",
+  cycle2earnAbi,
+  new VeChainPrivateKeySigner(
+    Buffer.from(privateKey),
+    new VeChainProvider(thor)
+  )
+);
+```
+
+### Security Best Practices
+
+1. **Environment Variables**: Never commit mnemonics or private keys to version control
+2. **Key Derivation**: Use BIP39 mnemonics with proper derivation paths
+3. **Hex Format**: Ensure private keys are properly formatted (64 hex characters)
+4. **Network Selection**: Use testnet for development, mainnet for production
+5. **Key Rotation**: Regularly rotate production keys and mnemonics
+
 ## 📊 Strava API Integration
 
 ### Setup Process
@@ -217,24 +265,6 @@ npm install
 npx hardhat compile
 npx hardhat run scripts/deploy.ts --network testnet
 ```
-
-## 🧪 Testing
-
-### Running Tests
-```bash
-# Frontend tests
-npm run test
-
-# Smart contract tests
-cd ../sdk-hardhat-integration
-npx hardhat test
-```
-
-### Test Coverage
-- Unit tests for components
-- Integration tests for API endpoints
-- Smart contract functionality tests
-- End-to-end user flow tests
 
 ## 📈 Roadmap
 
