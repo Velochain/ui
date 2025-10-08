@@ -430,7 +430,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Strava** for fitness tracking API
 - **OpenZeppelin** for smart contract security
 - **Next.js** team for the amazing framework
-- **Community contributors** for feedback and support
 
 ---
 
